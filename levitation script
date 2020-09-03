@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class hover3 : MonoBehaviour
+{
+    public List<GameObject> suspension;
+    
+    
+  
+    public Rigidbody rb;
+    public GameObject prop;
+    public GameObject CM;
+    public Vector3 jumper;
+    public float horizontalforce;
+    public  float verticalforce;
+
+
+
+
+    void Start()
+    {
+        rb.centerOfMass = CM.transform.localPosition;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKey("g"))
+        {
+            rb.AddForceAtPosition(jumper* Time.deltaTime, prop.transform.position);
+        }
+        rb.AddForceAtPosition(Time.deltaTime * transform.TransformDirection(Vector3.forward) * Input.GetAxis("Vertical") * verticalforce, prop.transform.position);
+        rb.AddTorque(Time.deltaTime * transform.TransformDirection(Vector3.up) * Input.GetAxis("Horizontal") * horizontalforce);
+        foreach (GameObject spring in suspension)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(spring.transform.position, transform.TransformDirection(Vector3.down), out hit, 3f))
+            {
+                rb.AddForceAtPosition(Time.deltaTime * transform.TransformDirection(Vector3.up) * Mathf.Pow(3f - hit.distance, 2) / 3f * 250f, spring.transform.position);
+            }
+            Debug.Log(hit.distance);
+        }
+        rb.AddForce(-Time.deltaTime * transform.TransformVector(Vector3.right) * transform.InverseTransformVector(rb.velocity).x * 5f);
+    }
+}
